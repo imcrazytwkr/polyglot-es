@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+npm run --silent clean
+cp ./index.js ./build/polyglot.js
+npx uglifyjs -o ./build/polyglot.min.js ./index.js
+gzip -c ./build/polyglot.min.js > ./build/polyglot.min.js.gz
