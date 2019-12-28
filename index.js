@@ -184,37 +184,38 @@ const defaultTokenRegex = /%\{(.*?)\}/g;
 //
 // You should pass in a third argument, the locale, to specify the correct plural type.
 // It defaults to `'en'` with 2 plural forms.
-function transformPhrase(phrase, substitutions, locale, tokenRegex, pluralRules) {
+function transformPhrase(phrase, substitutions, locale = 'en', tokenRegex, pluralRules) {
   if (typeof phrase !== 'string') {
     throw new TypeError('Polyglot.transformPhrase expects argument #1 to be string');
   }
 
-  if (substitutions == null) {
-    return phrase;
-  }
+  if (typeof substitutions === 'undefined') return phrase;
 
   let result = phrase;
   const interpolationRegex = tokenRegex || defaultTokenRegex;
   const pluralRulesOrDefault = pluralRules || defaultPluralRules;
 
   // allow number as a pluralization shortcut
-  const options = typeof substitutions === 'number' ? { smart_count: substitutions } : substitutions;
+  const options = (typeof substitutions === 'number') ? {
+    smart_count: substitutions,
+  } : substitutions;
+  const smartCount = options.smart_count;
 
   // Select plural form: based on a phrase text that contains `n`
   // plural forms separated by `delimiter`, a `locale`, and a `substitutions.smart_count`,
   // choose the correct plural form. This is only done if `count` is set.
-  if (options.smart_count != null && result) {
+  if (typeof smartCount === 'number' && result) {
     const texts = result.split(delimiter);
-    result = (texts[pluralTypeIndex(pluralRulesOrDefault, locale || 'en', options.smart_count)] || texts[0]).trim();
+    result = (texts[pluralTypeIndex(pluralRulesOrDefault, locale, smartCount)] || texts[0]).trim();
   }
 
   // Interpolate: Creates a `RegExp` object for each interpolation placeholder.
-  result = result.replace(interpolationRegex, (expression, argument) => {
-    if (!has(options, argument) || options[argument] == null) return expression;
-    return options[argument];
-  });
+  const replacer = (expression, argument) => {
+    const replacement = options[argument];
+    return (typeof replacement === 'undefined') ? expression : replacement;
+  }
 
-  return result;
+  return result.replace(interpolationRegex, replacer);
 }
 
 class Polyglot {
