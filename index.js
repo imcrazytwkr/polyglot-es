@@ -48,7 +48,7 @@ const defaultPluralRules = Object.freeze({
     arabic: function (n) {
       // http://www.arabeyes.org/Plural_Forms
       if (n < 3) { return n; }
-      var lastTwo = n % 100;
+      const lastTwo = n % 100;
       if (lastTwo >= 3 && lastTwo <= 10) return 3;
       return lastTwo >= 11 ? 4 : 5;
     },
@@ -68,12 +68,12 @@ const defaultPluralRules = Object.freeze({
     },
     polish: function (n) {
       if (n === 1) { return 0; }
-      var end = n % 10;
+      const end = n % 10;
       return end >= 2 && end <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
     },
     icelandic: function (n) { return (n % 10 !== 1 || n % 100 === 11) ? 1 : 0; },
     slovenian: function (n) {
-      var lastTwo = n % 100;
+      const lastTwo = n % 100;
       if (lastTwo === 1) {
         return 0;
       }
