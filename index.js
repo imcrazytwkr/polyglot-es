@@ -298,9 +298,10 @@ Polyglot.prototype.extend = function (morePhrases, prefix) {
     const prefixedKey = prefix ? `${prefix}.${key}` : key;
     if (typeof phrase === 'object') {
       this.extend(phrase, prefixedKey);
-    } else {
-      this.phrases[prefixedKey] = phrase;
+      return;
     }
+
+    this.phrases[prefixedKey] = phrase;
   }, this);
 };
 
@@ -325,9 +326,10 @@ Polyglot.prototype.unset = function (morePhrases, prefix) {
     const prefixedKey = prefix ? `${prefix}.${key}` : key;
     if (typeof phrase === 'object') {
       this.unset(phrase, prefixedKey);
-    } else {
-      delete this.phrases[prefixedKey];
+      return;
     }
+
+    delete this.phrases[prefixedKey];
   }, this);
 };
 
