@@ -1,9 +1,5 @@
 {
-  "rules": {
-    "max-len": 0,
-  },
-
   "env": {
-    "mocha": true,
-  },
+    "mocha": true
+  }
 }
