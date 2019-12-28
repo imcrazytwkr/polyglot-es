@@ -14,8 +14,6 @@
 // translation; it simply gives you a way to manage translated phrases from
 // your client- or server-side JavaScript application.
 //
-const has = require('has');
-
 const noop = () => undefined;
 
 // #### Pluralization methods
