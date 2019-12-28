@@ -14,8 +14,6 @@
 // translation; it simply gives you a way to manage translated phrases from
 // your client- or server-side JavaScript application.
 //
-
-const objectEntries = require('object.entries');
 const warning = require('warning');
 const has = require('has');
 
@@ -127,18 +125,15 @@ const defaultPluralRules = Object.freeze({
 });
 
 function langToTypeMap(mapping) {
-  const ret = {};
+  const typeMap = {};
 
-  objectEntries(mapping).forEach(function (entry) {
-    const type = entry[0];
-    const langs = entry[1];
-
-    langs.forEach(function (lang) {
-      ret[lang] = type;
+  Object.entries(mapping).forEach(([type, langs]) => {
+    langs.forEach((lang) => {
+      typeMap[lang] = type;
     });
   });
 
-  return ret;
+  return typeMap;
 }
 
 function pluralTypeName(pluralRules, locale) {
@@ -296,7 +291,7 @@ Polyglot.prototype.locale = function (newLocale) {
 //
 // This feature is used internally to support nested phrase objects.
 Polyglot.prototype.extend = function (morePhrases, prefix) {
-  objectEntries(morePhrases).forEach(function (entry) {
+  Object.entries(morePhrases).forEach(entry => {
     const key = entry[0];
     const phrase = entry[1];
 
@@ -323,19 +318,17 @@ Polyglot.prototype.extend = function (morePhrases, prefix) {
 Polyglot.prototype.unset = function (morePhrases, prefix) {
   if (typeof morePhrases === 'string') {
     delete this.phrases[morePhrases];
-  } else {
-    objectEntries(morePhrases).forEach(function (entry) {
-      const key = entry[0];
-      const phrase = entry[1];
-
-      const prefixedKey = prefix ? prefix + '.' + key : key;
-      if (typeof phrase === 'object') {
-        this.unset(phrase, prefixedKey);
-      } else {
-        delete this.phrases[prefixedKey];
-      }
-    }, this);
+    return;
   }
+
+  Object.entries(morePhrases).forEach(([key, phrase]) => {
+    const prefixedKey = prefix ? prefix + '.' + key : key;
+    if (typeof phrase === 'object') {
+      this.unset(phrase, prefixedKey);
+    } else {
+      delete this.phrases[prefixedKey];
+    }
+  }, this);
 };
 
 // ### polyglot.clear()
