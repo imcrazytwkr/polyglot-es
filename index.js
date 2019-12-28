@@ -291,7 +291,7 @@ Polyglot.prototype.locale = function (newLocale) {
 //
 // This feature is used internally to support nested phrase objects.
 Polyglot.prototype.extend = function (morePhrases, prefix) {
-  Object.entries(morePhrases).forEach(entry => {
+  Object.entries(morePhrases).forEach((entry) => {
     const key = entry[0];
     const phrase = entry[1];
 
