@@ -379,8 +379,11 @@ Polyglot.prototype.replace = function (newPhrases) {
 //     => "I like to write in JavaScript."
 //
 Polyglot.prototype.t = function (key, options) {
-  let phrase, result;
+  let phrase;
+  let result;
+
   const opts = options == null ? {} : options;
+
   if (typeof this.phrases[key] === 'string') {
     phrase = this.phrases[key];
   } else if (typeof opts._ === 'string') {
