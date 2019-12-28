@@ -1,7 +1,7 @@
 {
   "root": true,
 
-  "extends": "airbnb-base/legacy",
+  "extends": "airbnb-base",
 
   "parserOptions": {
     "sourceType": "script"
@@ -13,6 +13,6 @@
     "one-var-declaration-per-line": 0,
     "no-use-before-define": 1,
     "vars-on-top": 0,
-    "yoda": 1,
+    "yoda": 0,
   }
 }
