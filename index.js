@@ -18,14 +18,10 @@
 const objectEntries = require('object.entries');
 const warning = require('warning');
 const has = require('has');
-const trim = require('string.prototype.trim');
 
 function warn(message) {
   warning(false, message);
 }
-
-const replace = String.prototype.replace;
-const split = String.prototype.split;
 
 // #### Pluralization methods
 // The string that separates the different phrase possibilities.
@@ -197,12 +193,12 @@ function transformPhrase(phrase, substitutions, locale, tokenRegex, pluralRules)
   // choose the correct plural form. This is only done if `count` is set.
   if (options.smart_count != null && result) {
     const texts = result.split(delimiter);
-    result = trim(texts[pluralTypeIndex(pluralRulesOrDefault, locale || 'en', options.smart_count)] || texts[0]);
+    result = (texts[pluralTypeIndex(pluralRulesOrDefault, locale || 'en', options.smart_count)] || texts[0]).trim();
   }
 
   // Interpolate: Creates a `RegExp` object for each interpolation placeholder.
-  result = replace.call(result, interpolationRegex, function (expression, argument) {
-    if (!has(options, argument) || options[argument] == null) { return expression; }
+  result = result.replace(interpolationRegex, function (expression, argument) {
+    if (!has(options, argument) || options[argument] == null) return expression;
     return options[argument];
   });
 
