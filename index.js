@@ -27,64 +27,84 @@ function warn(message) {
 // The string that separates the different phrase possibilities.
 const delimiter = '||||';
 
+function arabicPluralGroups(n) {
+  // http://www.arabeyes.org/Plural_Forms
+  if (n < 3) return n;
+
+  const lastTwo = n % 100;
+  if (lastTwo >= 3 && lastTwo <= 10) return 3;
+  return (lastTwo >= 11) ? 4 : 5;
+}
+
+function chinesePluralGroups() {
+  return 0;
+}
+
+function czechPluralGroups(n) {
+  if (n === 1) return 0;
+  return (n >= 2 && n <= 4) ? 1 : 2;
+}
+
+function frenchPluralGroups(n) {
+  return (n > 1) ? 1 : 0;
+}
+
+function germanPluralGroups(n) {
+  return (n !== 1) ? 1 : 0;
+}
+
+function icelandicPluralGroups(n) {
+  return (n % 10 !== 1 || n % 100 === 11) ? 1 : 0;
+}
+
+function lithuanianPluralGroups(n) {
+  if (n % 10 === 1 && n % 100 !== 11) return 0;
+  return (n % 10 >= 2 && n % 10 <= 9 && (n % 100 < 11 || n % 100 > 19)) ? 1 : 2;
+}
+
+function polistPluralGroups(n) {
+  if (n === 1) { return 0; }
+  const end = n % 10;
+  return end >= 2 && end <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
+}
+
 function russianPluralGroups(n) {
   const lastTwo = n % 100;
   const end = lastTwo % 10;
 
-  if (lastTwo !== 11 && end === 1) {
-    return 0;
-  }
+  if (lastTwo !== 11 && end === 1) return 0;
+  return (end >= 2 && end <= 4 && !(lastTwo >= 12 && lastTwo <= 14)) ? 1 : 2;
+}
 
-  if (end >= 2 && end <= 4 && !(lastTwo >= 12 && lastTwo <= 14)) {
-    return 1;
+function slovenianPluralGroups(n) {
+  switch (n % 100) {
+    case 1:
+      return 0;
+    case 2:
+      return 1;
+    case 3:
+    case 4:
+      return 2;
+    default:
+      return 3;
   }
-
-  return 2;
-};
+}
 
 const defaultPluralRules = Object.freeze({
   // Mapping from pluralization group plural logic.
   pluralTypes: {
-    arabic: function (n) {
-      // http://www.arabeyes.org/Plural_Forms
-      if (n < 3) { return n; }
-      const lastTwo = n % 100;
-      if (lastTwo >= 3 && lastTwo <= 10) return 3;
-      return lastTwo >= 11 ? 4 : 5;
-    },
+    arabic: arabicPluralGroups,
     bosnian_serbian: russianPluralGroups,
-    chinese: function () { return 0; },
+    chinese: chinesePluralGroups,
+    czech: czechPluralGroups,
     croatian: russianPluralGroups,
-    french: function (n) { return n > 1 ? 1 : 0; },
-    german: function (n) { return n !== 1 ? 1 : 0; },
+    french: frenchPluralGroups,
+    german: germanPluralGroups,
+    icelandic: icelandicPluralGroups,
+    lithuanian: lithuanianPluralGroups,
+    polish: polistPluralGroups,
     russian: russianPluralGroups,
-    lithuanian: function (n) {
-      if (n % 10 === 1 && n % 100 !== 11) { return 0; }
-      return n % 10 >= 2 && n % 10 <= 9 && (n % 100 < 11 || n % 100 > 19) ? 1 : 2;
-    },
-    czech: function (n) {
-      if (n === 1) { return 0; }
-      return (n >= 2 && n <= 4) ? 1 : 2;
-    },
-    polish: function (n) {
-      if (n === 1) { return 0; }
-      const end = n % 10;
-      return end >= 2 && end <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
-    },
-    icelandic: function (n) { return (n % 10 !== 1 || n % 100 === 11) ? 1 : 0; },
-    slovenian: function (n) {
-      const lastTwo = n % 100;
-      if (lastTwo === 1) {
-        return 0;
-      }
-      if (lastTwo === 2) {
-        return 1;
-      }
-      if (lastTwo === 3 || lastTwo === 4) {
-        return 2;
-      }
-      return 3;
-    }
+    slovenian: slovenianPluralGroups
   },
 
   // Mapping from pluralization group to individual language codes/locales.
