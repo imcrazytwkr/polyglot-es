@@ -211,7 +211,7 @@ function transformPhrase(phrase, substitutions, locale = 'en', tokenRegex, plura
   const replacer = (expression, argument) => {
     const replacement = options[argument];
     return (typeof replacement === 'undefined') ? expression : replacement;
-  }
+  };
 
   return result.replace(interpolationRegex, replacer);
 }
