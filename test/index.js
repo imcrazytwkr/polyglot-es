@@ -62,9 +62,11 @@ describe('t', () => {
   });
 
   describe('custom interpolation syntax', () => {
-    const createWithInterpolation = function (interpolation) {
-      return new Polyglot({ phrases: {}, allowMissing: true, interpolation });
-    };
+    const createWithInterpolation = (interpolation) => new Polyglot({
+      phrases: {},
+      allowMissing: true,
+      interpolation,
+    });
 
     it('interpolates with the specified custom token syntax', () => {
       const instance = createWithInterpolation({ prefix: '{{', suffix: '}}' });
@@ -132,7 +134,7 @@ describe('t', () => {
       const expectedOptions = {};
       const expectedLocale = 'oz';
       const returnValue = {};
-      const onMissingKey = function (key, options, locale) {
+      const onMissingKey = (key, options, locale) => {
         expect(key).to.equal(expectedKey);
         expect(options).to.equal(expectedOptions);
         expect(locale).to.equal(expectedLocale);
@@ -145,7 +147,7 @@ describe('t', () => {
 
     it('overrides allowMissing', (done) => {
       const missingKey = 'missing key';
-      const onMissingKey = function (key) {
+      const onMissingKey = (key) => {
         expect(key).to.equal(missingKey);
         done();
       };
