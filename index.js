@@ -386,8 +386,7 @@ Polyglot.prototype.t = function (key, options) {
   } else if (typeof opts._ === 'string') {
     phrase = opts._;
   } else if (this.onMissingKey) {
-    const onMissingKey = this.onMissingKey;
-    result = onMissingKey(key, opts, this.currentLocale, this.tokenRegex, this.pluralRules);
+    result = this.onMissingKey(key, opts, this.currentLocale, this.tokenRegex, this.pluralRules);
   } else {
     this.warn(`Missing translation for key: "${key}"`);
     result = key;
