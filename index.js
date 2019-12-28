@@ -14,12 +14,9 @@
 // translation; it simply gives you a way to manage translated phrases from
 // your client- or server-side JavaScript application.
 //
-const warning = require('warning');
 const has = require('has');
 
-function warn(message) {
-  warning(false, message);
-}
+const noop = () => undefined;
 
 // #### Pluralization methods
 // The string that separates the different phrase possibilities.
@@ -228,7 +225,7 @@ function Polyglot(options) {
   this.currentLocale = opts.locale || 'en';
   const allowMissing = opts.allowMissing ? transformPhrase : null;
   this.onMissingKey = typeof opts.onMissingKey === 'function' ? opts.onMissingKey : allowMissing;
-  this.warn = opts.warn || warn;
+  this.warn = opts.warn || noop;
   this.tokenRegex = constructTokenRegex(opts.interpolation);
   this.pluralRules = opts.pluralRules || defaultPluralRules;
 }
