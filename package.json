@@ -1,5 +1,5 @@
 {
-  "name": "node-polyglot",
+  "name": "@imcrazytwkr/polyglot-es",
   "version": "2.4.0",
   "description": "Give your JavaScript the ability to speak many languages.",
   "main": "index.js",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/airbnb/polyglot.js.git"
+    "url": "git://github.com/imcrazytwkr/polyglot-es.git"
   },
   "keywords": [
     "i18n",
