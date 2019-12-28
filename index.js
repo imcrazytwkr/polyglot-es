@@ -104,7 +104,7 @@ const defaultPluralRules = Object.freeze({
     lithuanian: lithuanianPluralGroups,
     polish: polistPluralGroups,
     russian: russianPluralGroups,
-    slovenian: slovenianPluralGroups
+    slovenian: slovenianPluralGroups,
   },
 
   // Mapping from pluralization group to individual language codes/locales.
@@ -122,8 +122,8 @@ const defaultPluralRules = Object.freeze({
     czech: ['cs', 'cs-CZ', 'sk'],
     polish: ['pl'],
     icelandic: ['is'],
-    slovenian: ['sl-SL']
-  }
+    slovenian: ['sl-SL'],
+  },
 });
 
 function langToTypeMap(mapping) {
