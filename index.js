@@ -212,7 +212,7 @@ function transformPhrase(phrase, substitutions, locale, tokenRegex, pluralRules)
   }
 
   // Interpolate: Creates a `RegExp` object for each interpolation placeholder.
-  result = result.replace(interpolationRegex, function (expression, argument) {
+  result = result.replace(interpolationRegex, (expression, argument) => {
     if (!has(options, argument) || options[argument] == null) return expression;
     return options[argument];
   });
