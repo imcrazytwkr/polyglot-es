@@ -156,10 +156,10 @@ function constructTokenRegex(opts) {
   const suffix = (opts && opts.suffix) || '}';
 
   if (prefix === delimiter || suffix === delimiter) {
-    throw new RangeError('"' + delimiter + '" token is reserved for pluralization');
+    throw new RangeError(`"${delimiter}" token is reserved for pluralization`);
   }
 
-  return new RegExp(escape(prefix) + '(.*?)' + escape(suffix), 'g');
+  return new RegExp(`${escape(prefix)}(.*?)${escape(suffix)}`, 'g');
 }
 
 const defaultTokenRegex = /%\{(.*?)\}/g;
@@ -295,7 +295,7 @@ Polyglot.prototype.extend = function (morePhrases, prefix) {
     const key = entry[0];
     const phrase = entry[1];
 
-    const prefixedKey = prefix ? prefix + '.' + key : key;
+    const prefixedKey = prefix ? `${prefix}.${key}` : key;
     if (typeof phrase === 'object') {
       this.extend(phrase, prefixedKey);
     } else {
@@ -322,7 +322,7 @@ Polyglot.prototype.unset = function (morePhrases, prefix) {
   }
 
   Object.entries(morePhrases).forEach(([key, phrase]) => {
-    const prefixedKey = prefix ? prefix + '.' + key : key;
+    const prefixedKey = prefix ? `${prefix}.${key}` : key;
     if (typeof phrase === 'object') {
       this.unset(phrase, prefixedKey);
     } else {
@@ -387,7 +387,7 @@ Polyglot.prototype.t = function (key, options) {
     const onMissingKey = this.onMissingKey;
     result = onMissingKey(key, opts, this.currentLocale, this.tokenRegex, this.pluralRules);
   } else {
-    this.warn('Missing translation for key: "' + key + '"');
+    this.warn(`Missing translation for key: "${key}"`);
     result = key;
   }
   if (typeof phrase === 'string') {
