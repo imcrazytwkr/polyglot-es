@@ -1,17 +1,17 @@
 'use strict';
 
-var Polyglot = require('../');
-var expect = require('chai').expect;
+const Polyglot = require('../');
+const expect = require('chai').expect;
 
 describe('t', function () {
-  var phrases = {
+  const phrases = {
     hello: 'Hello',
     hi_name_welcome_to_place: 'Hi, %{name}, welcome to %{place}!',
     name_your_name_is_name: '%{name}, your name is %{name}!',
     empty_string: ''
   };
 
-  var polyglot;
+  let polyglot;
   beforeEach(function () {
     polyglot = new Polyglot({ phrases: phrases });
   });
@@ -57,33 +57,33 @@ describe('t', function () {
   });
 
   it('returns an interpolated key if initialized with allowMissing and translation not found', function () {
-    var instance = new Polyglot({ phrases: phrases, allowMissing: true });
+    const instance = new Polyglot({ phrases: phrases, allowMissing: true });
     expect(instance.t('Welcome %{name}', {
       name: 'Robert'
     })).to.equal('Welcome Robert');
   });
 
   describe('custom interpolation syntax', function () {
-    var createWithInterpolation = function (interpolation) {
+    const createWithInterpolation = function (interpolation) {
       return new Polyglot({ phrases: {}, allowMissing: true, interpolation: interpolation });
     };
 
     it('interpolates with the specified custom token syntax', function () {
-      var instance = createWithInterpolation({ prefix: '{{', suffix: '}}' });
+      const instance = createWithInterpolation({ prefix: '{{', suffix: '}}' });
       expect(instance.t('Welcome {{name}}', {
         name: 'Robert'
       })).to.equal('Welcome Robert');
     });
 
     it('interpolates if the prefix and suffix are the same', function () {
-      var instance = createWithInterpolation({ prefix: '|', suffix: '|' });
+      const instance = createWithInterpolation({ prefix: '|', suffix: '|' });
       expect(instance.t('Welcome |name|, how are you, |name|?', {
         name: 'Robert'
       })).to.equal('Welcome Robert, how are you, Robert?');
     });
 
     it('interpolates when using regular expression tokens', function () {
-      var instance = createWithInterpolation({ prefix: '\\s.*', suffix: '\\d.+' });
+      const instance = createWithInterpolation({ prefix: '\\s.*', suffix: '\\d.+' });
       expect(instance.t('Welcome \\s.*name\\d.+', {
         name: 'Robert'
       })).to.equal('Welcome Robert');
@@ -111,7 +111,7 @@ describe('t', function () {
   });
 
   it('supports nested phrase objects', function () {
-    var nestedPhrases = {
+    const nestedPhrases = Object.freeze({
       nav: {
         presentations: 'Presentations',
         hi_user: 'Hi, %{user}.',
@@ -120,8 +120,8 @@ describe('t', function () {
         }
       },
       'header.sign_in': 'Sign In'
-    };
-    var instance = new Polyglot({ phrases: nestedPhrases });
+    });
+    const instance = new Polyglot({ phrases: nestedPhrases });
     expect(instance.t('nav.presentations')).to.equal('Presentations');
     expect(instance.t('nav.hi_user', { user: 'Raph' })).to.equal('Hi, Raph.');
     expect(instance.t('nav.cta.join_now')).to.equal('Join now!');
@@ -130,39 +130,39 @@ describe('t', function () {
 
   describe('onMissingKey', function () {
     it('calls the function when a key is missing', function () {
-      var expectedKey = 'some key';
-      var expectedOptions = {};
-      var expectedLocale = 'oz';
-      var returnValue = {};
-      var onMissingKey = function (key, options, locale) {
+      const expectedKey = 'some key';
+      const expectedOptions = {};
+      const expectedLocale = 'oz';
+      const returnValue = {};
+      const onMissingKey = function (key, options, locale) {
         expect(key).to.equal(expectedKey);
         expect(options).to.equal(expectedOptions);
         expect(locale).to.equal(expectedLocale);
         return returnValue;
       };
-      var instance = new Polyglot({ onMissingKey: onMissingKey, locale: expectedLocale });
-      var result = instance.t(expectedKey, expectedOptions);
+      const instance = new Polyglot({ onMissingKey: onMissingKey, locale: expectedLocale });
+      const result = instance.t(expectedKey, expectedOptions);
       expect(result).to.equal(returnValue);
     });
 
     it('overrides allowMissing', function (done) {
-      var missingKey = 'missing key';
-      var onMissingKey = function (key) {
+      const missingKey = 'missing key';
+      const onMissingKey = function (key) {
         expect(key).to.equal(missingKey);
         done();
       };
-      var instance = new Polyglot({ onMissingKey: onMissingKey, allowMissing: true });
+      const instance = new Polyglot({ onMissingKey: onMissingKey, allowMissing: true });
       instance.t(missingKey);
     });
   });
 });
 
 describe('pluralize', function () {
-  var phrases = {
+  const phrases = Object.freeze({
     count_name: '%{smart_count} Name |||| %{smart_count} Names'
-  };
+  });
 
-  var polyglot;
+  let polyglot;
   beforeEach(function () {
     polyglot = new Polyglot({ phrases: phrases, locale: 'en' });
   });
@@ -182,7 +182,7 @@ describe('pluralize', function () {
   });
 
   it('ignores a region subtag when choosing a pluralization rule', function () {
-    var instance = new Polyglot({ phrases: phrases, locale: 'fr-FR' });
+    const instance = new Polyglot({ phrases: phrases, locale: 'fr-FR' });
     // French rule: "0" is singular
     expect(instance.t('count_name', 0)).to.equal('0 Name');
   });
@@ -191,19 +191,19 @@ describe('pluralize', function () {
 describe('locale-specific pluralization rules', function () {
   it('pluralizes in Arabic', function () {
     // English would be: "1 vote" / "%{smart_count} votes"
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       'ولا صوت',
       'صوت واحد',
       'صوتان',
       '%{smart_count} أصوات',
       '%{smart_count} صوت',
       '%{smart_count} صوت'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_votes: whatSomeoneTranslated.join(' |||| ')
-    };
+    });
 
-    var polyglot = new Polyglot({ phrases: phrases, locale: 'ar' });
+    const polyglot = new Polyglot({ phrases: phrases, locale: 'ar' });
 
     expect(polyglot.t('n_votes', 0)).to.equal('ولا صوت');
     expect(polyglot.t('n_votes', 1)).to.equal('صوت واحد');
@@ -215,16 +215,16 @@ describe('locale-specific pluralization rules', function () {
 
   it('pluralizes in Russian', function () {
     // English would be: "1 vote" / "%{smart_count} votes"
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       '%{smart_count} машина',
       '%{smart_count} машины',
       '%{smart_count} машин'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_votes: whatSomeoneTranslated.join(' |||| ')
-    };
+    });
 
-    var polyglotLanguageCode = new Polyglot({ phrases: phrases, locale: 'ru' });
+    const polyglotLanguageCode = new Polyglot({ phrases: phrases, locale: 'ru' });
 
     expect(polyglotLanguageCode.t('n_votes', 1)).to.equal('1 машина');
     expect(polyglotLanguageCode.t('n_votes', 11)).to.equal('11 машин');
@@ -237,7 +237,7 @@ describe('locale-specific pluralization rules', function () {
     expect(polyglotLanguageCode.t('n_votes', 14)).to.equal('14 машин');
     expect(polyglotLanguageCode.t('n_votes', 15)).to.equal('15 машин');
 
-    var polyglotLocaleId = new Polyglot({ phrases: phrases, locale: 'ru-RU' });
+    const polyglotLocaleId = new Polyglot({ phrases: phrases, locale: 'ru-RU' });
 
     expect(polyglotLocaleId.t('n_votes', 1)).to.equal('1 машина');
     expect(polyglotLocaleId.t('n_votes', 11)).to.equal('11 машин');
@@ -253,16 +253,16 @@ describe('locale-specific pluralization rules', function () {
 
   it('pluralizes in Croatian (guest) Test', function () {
     // English would be: "1 vote" / "%{smart_count} votes"
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       '%{smart_count} gost',
       '%{smart_count} gosta',
       '%{smart_count} gostiju'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_guests: whatSomeoneTranslated.join(' |||| ')
-    };
+    });
 
-    var polyglotLocale = new Polyglot({ phrases: phrases, locale: 'hr-HR' });
+    const polyglotLocale = new Polyglot({ phrases: phrases, locale: 'hr-HR' });
 
     expect(polyglotLocale.t('n_guests', 1)).to.equal('1 gost');
     expect(polyglotLocale.t('n_guests', 11)).to.equal('11 gostiju');
@@ -282,16 +282,16 @@ describe('locale-specific pluralization rules', function () {
 
   it('pluralizes in Croatian (vote) Test', function () {
     // English would be: "1 vote" / "%{smart_count} votes"
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       '%{smart_count} glas',
       '%{smart_count} glasa',
       '%{smart_count} glasova'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_votes: whatSomeoneTranslated.join(' |||| ')
-    };
+    });
 
-    var polyglotLocale = new Polyglot({ phrases: phrases, locale: 'hr-HR' });
+    const polyglotLocale = new Polyglot({ phrases: phrases, locale: 'hr-HR' });
 
     [1, 21, 31, 101].forEach(function (c) {
       expect(polyglotLocale.t('n_votes', c)).to.equal(c + ' glas');
@@ -303,7 +303,7 @@ describe('locale-specific pluralization rules', function () {
       expect(polyglotLocale.t('n_votes', c)).to.equal(c + ' glasova');
     });
 
-    var polyglotLanguageCode = new Polyglot({ phrases: phrases, locale: 'hr' });
+    const polyglotLanguageCode = new Polyglot({ phrases: phrases, locale: 'hr' });
 
     [1, 21, 31, 101].forEach(function (c) {
       expect(polyglotLanguageCode.t('n_votes', c)).to.equal(c + ' glas');
@@ -318,16 +318,16 @@ describe('locale-specific pluralization rules', function () {
 
   it('pluralizes in Serbian (Latin & Cyrillic)', function () {
     // English would be: "1 vote" / "%{smart_count} votes"
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       '%{smart_count} miš',
       '%{smart_count} miša',
       '%{smart_count} miševa'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_votes: whatSomeoneTranslated.join(' |||| ')
-    };
+    });
 
-    var polyglotLatin = new Polyglot({ phrases: phrases, locale: 'srl-RS' });
+    const polyglotLatin = new Polyglot({ phrases: phrases, locale: 'srl-RS' });
 
     expect(polyglotLatin.t('n_votes', 1)).to.equal('1 miš');
     expect(polyglotLatin.t('n_votes', 11)).to.equal('11 miševa');
@@ -340,7 +340,7 @@ describe('locale-specific pluralization rules', function () {
     expect(polyglotLatin.t('n_votes', 15)).to.equal('15 miševa');
     expect(polyglotLatin.t('n_votes', 0)).to.equal('0 miševa');
 
-    var polyglotCyrillic = new Polyglot({ phrases: phrases, locale: 'sr-RS' });
+    const polyglotCyrillic = new Polyglot({ phrases: phrases, locale: 'sr-RS' });
 
     expect(polyglotCyrillic.t('n_votes', 1)).to.equal('1 miš');
     expect(polyglotCyrillic.t('n_votes', 11)).to.equal('11 miševa');
@@ -356,16 +356,16 @@ describe('locale-specific pluralization rules', function () {
 
   it('pluralizes in Bosnian (Latin & Cyrillic)', function () {
     // English would be: "1 vote" / "%{smart_count} votes"
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       '%{smart_count} članak',
       '%{smart_count} članka',
       '%{smart_count} članaka'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_votes: whatSomeoneTranslated.join(' |||| ')
-    };
+    });
 
-    var polyglotLatin = new Polyglot({ phrases: phrases, locale: 'bs-Latn-BA' });
+    const polyglotLatin = new Polyglot({ phrases: phrases, locale: 'bs-Latn-BA' });
 
     expect(polyglotLatin.t('n_votes', 1)).to.equal('1 članak');
     expect(polyglotLatin.t('n_votes', 11)).to.equal('11 članaka');
@@ -382,7 +382,7 @@ describe('locale-specific pluralization rules', function () {
     expect(polyglotLatin.t('n_votes', 115)).to.equal('115 članaka');
     expect(polyglotLatin.t('n_votes', 0)).to.equal('0 članaka');
 
-    var polyglotCyrillic = new Polyglot({ phrases: phrases, locale: 'bs-Cyrl-BA' });
+    const polyglotCyrillic = new Polyglot({ phrases: phrases, locale: 'bs-Cyrl-BA' });
 
     expect(polyglotCyrillic.t('n_votes', 1)).to.equal('1 članak');
     expect(polyglotCyrillic.t('n_votes', 11)).to.equal('11 članaka');
@@ -402,16 +402,16 @@ describe('locale-specific pluralization rules', function () {
 
   it('pluralizes in Czech', function () {
     // English would be: "1 vote" / "%{smart_count} votes"
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       '%{smart_count} komentář',
       '%{smart_count} komentáře',
       '%{smart_count} komentářů'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_votes: whatSomeoneTranslated.join(' |||| ')
-    };
+    });
 
-    var polyglot = new Polyglot({ phrases: phrases, locale: 'cs-CZ' });
+    const polyglot = new Polyglot({ phrases: phrases, locale: 'cs-CZ' });
 
     expect(polyglot.t('n_votes', 1)).to.equal('1 komentář');
     expect(polyglot.t('n_votes', 2)).to.equal('2 komentáře');
@@ -425,17 +425,17 @@ describe('locale-specific pluralization rules', function () {
 
   it('pluralizes in Slovenian', function () {
     // English would be: "1 vote" / "%{smart_count} votes"
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       '%{smart_count} komentar',
       '%{smart_count} komentarja',
       '%{smart_count} komentarji',
       '%{smart_count} komentarjev'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_votes: whatSomeoneTranslated.join(' |||| ')
-    };
+    });
 
-    var polyglot = new Polyglot({ phrases: phrases, locale: 'sl-SL' });
+    const polyglot = new Polyglot({ phrases: phrases, locale: 'sl-SL' });
 
     [1, 12301, 101, 1001, 201, 301].forEach(function (c) {
       expect(polyglot.t('n_votes', c)).to.equal(c + ' komentar');
@@ -451,30 +451,30 @@ describe('locale-specific pluralization rules', function () {
   });
 
   it('pluralizes in Turkish', function () {
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       'Sepetinizde %{smart_count} X var. Bunu almak istiyor musunuz?',
       'Sepetinizde %{smart_count} X var. Bunları almak istiyor musunuz?'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_x_cart: whatSomeoneTranslated.join(' |||| ')
-    };
+    });
 
-    var polyglot = new Polyglot({ phrases: phrases, locale: 'tr' });
+    const polyglot = new Polyglot({ phrases: phrases, locale: 'tr' });
 
     expect(polyglot.t('n_x_cart', 1)).to.equal('Sepetinizde 1 X var. Bunu almak istiyor musunuz?');
     expect(polyglot.t('n_x_cart', 2)).to.equal('Sepetinizde 2 X var. Bunları almak istiyor musunuz?');
   });
 
   it('pluralizes in Lithuanian', function () {
-    var whatSomeoneTranslated = [
+    const whatSomeoneTranslated = Object.freeze([
       '%{smart_count} balsas',
       '%{smart_count} balsai',
       '%{smart_count} balsų'
-    ];
-    var phrases = {
+    ]);
+    const phrases = Object.freeze({
       n_votes: whatSomeoneTranslated.join(' |||| ')
-    };
-    var polyglot = new Polyglot({ phrases: phrases, locale: 'lt' });
+    });
+    const polyglot = new Polyglot({ phrases: phrases, locale: 'lt' });
 
     expect(polyglot.t('n_votes', 0)).to.equal('0 balsų');
     expect(polyglot.t('n_votes', 1)).to.equal('1 balsas');
@@ -491,7 +491,7 @@ describe('locale-specific pluralization rules', function () {
 });
 
 describe('custom pluralRules', function () {
-  var customPluralRules = {
+  const customPluralRules = Object.freeze({
     pluralTypes: {
       germanLike: function (n) {
         // is 1
@@ -514,14 +514,14 @@ describe('custom pluralRules', function () {
       germanLike: ['x1'],
       frenchLike: ['x2']
     }
-  };
+  });
 
-  var testPhrases = {
+  const testPhrases = Object.freeze({
     test_phrase: '%{smart_count} form zero |||| %{smart_count} form one'
-  };
+  });
 
   it('pluralizes in x1', function () {
-    var polyglot = new Polyglot({
+    const polyglot = new Polyglot({
       phrases: testPhrases,
       locale: 'x1',
       pluralRules: customPluralRules
@@ -533,7 +533,7 @@ describe('custom pluralRules', function () {
   });
 
   it('pluralizes in x2', function () {
-    var polyglot = new Polyglot({
+    const polyglot = new Polyglot({
       phrases: testPhrases,
       locale: 'x2',
       pluralRules: customPluralRules
@@ -546,7 +546,7 @@ describe('custom pluralRules', function () {
 });
 
 describe('locale', function () {
-  var polyglot;
+  let polyglot;
   beforeEach(function () {
     polyglot = new Polyglot();
   });
@@ -565,7 +565,7 @@ describe('locale', function () {
 });
 
 describe('extend', function () {
-  var polyglot;
+  let polyglot;
   beforeEach(function () {
     polyglot = new Polyglot();
   });
@@ -611,7 +611,7 @@ describe('extend', function () {
 });
 
 describe('clear', function () {
-  var polyglot;
+  let polyglot;
   beforeEach(function () {
     polyglot = new Polyglot();
   });
@@ -624,7 +624,7 @@ describe('clear', function () {
 });
 
 describe('replace', function () {
-  var polyglot;
+  let polyglot;
   beforeEach(function () {
     polyglot = new Polyglot();
   });
@@ -638,7 +638,7 @@ describe('replace', function () {
 });
 
 describe('unset', function () {
-  var polyglot;
+  let polyglot;
   beforeEach(function () {
     polyglot = new Polyglot();
   });
@@ -671,9 +671,9 @@ describe('unset', function () {
 });
 
 describe('transformPhrase', function () {
-  var simple = '%{name} is %{attribute}';
-  var english = '%{smart_count} Name |||| %{smart_count} Names';
-  var arabic = [
+  const simple = '%{name} is %{attribute}';
+  const english = '%{smart_count} Name |||| %{smart_count} Names';
+  const arabic = [
     'ولا صوت',
     'صوت واحد',
     'صوتان',
