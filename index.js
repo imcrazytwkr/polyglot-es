@@ -139,6 +139,10 @@ const defaultPluralRules = Object.freeze({
   },
 });
 
+function getEntries(hashmap) {
+  return (hashmap instanceof Map) ? Array.from(hashmap.entries()) : Object.entries(hashmap);
+}
+
 function accumulateToTypeMap(accumulator, [type, langs]) {
   // @NOTE: filter by boolean is added to trim all empty and undefined (from trailing commas
   // in multi-line arrays, for example) values
@@ -149,7 +153,7 @@ function accumulateToTypeMap(accumulator, [type, langs]) {
 }
 
 function langToTypeMap(mapping) {
-  return Object.entries(mapping).reduce(accumulateToTypeMap, {});
+  return getEntries(mapping).reduce(accumulateToTypeMap, {});
 }
 
 function pluralTypeName(pluralRules, locale) {
@@ -182,7 +186,7 @@ const defaultTokenRegex = /%\{(.*?)\}/g;
 class Polyglot {
   // ### Polyglot class constructor
   constructor(options = {}) {
-    this.phrases = {};
+    this.phrases = new Map();
     this.extend(options.phrases || {});
     this.currentLocale = options.locale || 'en';
     const allowMissing = options.allowMissing ? Polyglot.transformPhrase : null;
@@ -251,15 +255,18 @@ class Polyglot {
   //
   // This feature is used internally to support nested phrase objects.
   extend(morePhrases, prefix) {
-    Object.entries(morePhrases).forEach(([key, phrase]) => {
+    getEntries(morePhrases).forEach(([key, phrase]) => {
       const prefixedKey = prefix ? `${prefix}.${key}` : key;
+
       if (typeof phrase === 'object') {
         this.extend(phrase, prefixedKey);
         return;
       }
 
-      this.phrases[prefixedKey] = phrase;
-    }, this);
+      this.phrases.set(prefixedKey, phrase);
+    });
+
+    return this;
   }
 
   // ### Polyglot#unset(phrases)
@@ -273,21 +280,26 @@ class Polyglot {
   //
   // The unset method can take either a string (for the key), or an object hash with
   // the keys that you would like to unset.
+  //
+  // Returns the count of existing keys that had been deleted.
   unset(morePhrases, prefix) {
-    if (typeof morePhrases === 'string') {
-      delete this.phrases[morePhrases];
-      return;
+    const keyType = typeof morePhrases;
+    if (keyType === 'string') return Number(this.phrases.delete(morePhrases));
+    if (keyType !== 'object') {
+      throw new TypeError('Polyglot#unset expects a key, an Array of keys or a dict Object');
     }
 
-    Object.entries(morePhrases).forEach(([key, phrase]) => {
-      const prefixedKey = prefix ? `${prefix}.${key}` : key;
-      if (typeof phrase === 'object') {
-        this.unset(phrase, prefixedKey);
-        return;
-      }
+    const prefixKey = (key) => (prefix ? `${prefix}.${key}` : key);
 
-      delete this.phrases[prefixedKey];
-    }, this);
+    if (Array.isArray(morePhrases)) {
+      return morePhrases.map(prefixKey).filter(this.phrases.delete, this.phrases).length;
+    }
+
+    return getEntries(morePhrases).reduce((count, [key, phrase]) => {
+      const prefixedKey = prefixKey(key);
+      if (typeof phrase === 'object') return count + this.unset(phrase, prefixedKey);
+      return count + Number(this.phrases.delete(prefixedKey));
+    }, 0);
   }
 
   // ### Polyglot#clear()
@@ -296,7 +308,7 @@ class Polyglot {
   // up memory if you have lots of phrases but no longer need to
   // perform any translation. Also used internally by `replace`.
   clear() {
-    this.phrases = {};
+    this.phrases.clear();
   }
 
   // ### Polyglot#replace(phrases)
@@ -338,8 +350,8 @@ class Polyglot {
     let phrase;
     let result;
 
-    if (typeof this.phrases[key] === 'string') {
-      phrase = this.phrases[key];
+    if (this.has(key)) {
+      phrase = this.phrases.get(key);
     } else if (typeof options._ === 'string') {
       phrase = options._;
     } else if (this.onMissingKey) {
@@ -372,7 +384,7 @@ class Polyglot {
   //
   // Check if polyglot has a translation for given key
   has(key) {
-    return Boolean(this.phrases[key]);
+    return this.phrases.has(key);
   }
 
   // ### Polyglot.transformPhrase(phrase, substitutions, locale)
