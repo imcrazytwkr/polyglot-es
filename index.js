@@ -287,10 +287,7 @@ class Polyglot {
   //
   // This feature is used internally to support nested phrase objects.
   extend(morePhrases, prefix) {
-    Object.entries(morePhrases).forEach((entry) => {
-      const key = entry[0];
-      const phrase = entry[1];
-
+    Object.entries(morePhrases).forEach(([key, phrase]) => {
       const prefixedKey = prefix ? `${prefix}.${key}` : key;
       if (typeof phrase === 'object') {
         this.extend(phrase, prefixedKey);
