@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+if [ -d ./build ]; then
+  if [ ! -f ./build/.gitignore ]; then
+    echo 'Could not find .gitignore in build directory. Please re-clone the repository.'
+    exit 1
+  fi
+
+  cp ./build/.gitignore ./build.gitignore
+  rm -rf ./build/*
+  mv ./build.gitignore ./build/.gitignore
+fi
