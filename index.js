@@ -157,70 +157,13 @@ function constructTokenRegex(options = {}) {
 
 const defaultTokenRegex = /%\{(.*?)\}/g;
 
-// ### transformPhrase(phrase, substitutions, locale)
-//
-// Takes a phrase string and transforms it by choosing the correct
-// plural form and interpolating it.
-//
-//     transformPhrase('Hello, %{name}!', {name: 'Spike'});
-//     // "Hello, Spike!"
-//
-// The correct plural form is selected if substitutions.smart_count
-// is set. You can pass in a number instead of an Object as `substitutions`
-// as a shortcut for `smart_count`.
-//
-//     transformPhrase('%{smart_count} new messages |||| 1 new message', {smart_count: 1}, 'en');
-//     // "1 new message"
-//
-//     transformPhrase('%{smart_count} new messages |||| 1 new message', {smart_count: 2}, 'en');
-//     // "2 new messages"
-//
-//     transformPhrase('%{smart_count} new messages |||| 1 new message', 5, 'en');
-//     // "5 new messages"
-//
-// You should pass in a third argument, the locale, to specify the correct plural type.
-// It defaults to `'en'` with 2 plural forms.
-function transformPhrase(phrase, substitutions, locale = 'en', tokenRegex, pluralRules) {
-  if (typeof phrase !== 'string') {
-    throw new TypeError('Polyglot.transformPhrase expects argument #1 to be string');
-  }
-
-  if (typeof substitutions === 'undefined') return phrase;
-
-  let result = phrase;
-  const interpolationRegex = tokenRegex || defaultTokenRegex;
-  const pluralRulesOrDefault = pluralRules || defaultPluralRules;
-
-  // allow number as a pluralization shortcut
-  const options = (typeof substitutions === 'number') ? {
-    smart_count: substitutions,
-  } : substitutions;
-  const smartCount = options.smart_count;
-
-  // Select plural form: based on a phrase text that contains `n`
-  // plural forms separated by `delimiter`, a `locale`, and a `substitutions.smart_count`,
-  // choose the correct plural form. This is only done if `count` is set.
-  if (typeof smartCount === 'number' && result) {
-    const texts = result.split(delimiter);
-    result = (texts[pluralTypeIndex(pluralRulesOrDefault, locale, smartCount)] || texts[0]).trim();
-  }
-
-  // Interpolate: Creates a `RegExp` object for each interpolation placeholder.
-  const replacer = (expression, argument) => {
-    const replacement = options[argument];
-    return (typeof replacement === 'undefined') ? expression : replacement;
-  };
-
-  return result.replace(interpolationRegex, replacer);
-}
-
 class Polyglot {
   // ### Polyglot class constructor
   constructor(options = {}) {
     this.phrases = {};
     this.extend(options.phrases || {});
     this.currentLocale = options.locale || 'en';
-    const allowMissing = options.allowMissing ? transformPhrase : null;
+    const allowMissing = options.allowMissing ? Polyglot.transformPhrase : null;
     const { onMissingKey } = options;
     this.onMissingKey = typeof onMissingKey === 'function' ? onMissingKey : allowMissing;
     this.warn = options.warn || noop;
@@ -391,7 +334,7 @@ class Polyglot {
     }
 
     if (typeof phrase === 'string') {
-      result = transformPhrase(
+      result = Polyglot.transformPhrase(
         phrase,
         options,
         this.currentLocale,
@@ -409,10 +352,67 @@ class Polyglot {
   has(key) {
     return Boolean(this.phrases[key]);
   }
+
+  // ### Polyglot.transformPhrase(phrase, substitutions, locale)
+  //
+  // Takes a phrase string and transforms it by choosing the correct
+  // plural form and interpolating it.
+  //
+  //     transformPhrase('Hello, %{name}!', {name: 'Spike'});
+  //     // "Hello, Spike!"
+  //
+  // The correct plural form is selected if substitutions.smart_count
+  // is set. You can pass in a number instead of an Object as `substitutions`
+  // as a shortcut for `smart_count`.
+  //
+  //     transformPhrase('%{smart_count} new messages |||| 1 new message', {smart_count: 1}, 'en');
+  //     // "1 new message"
+  //
+  //     transformPhrase('%{smart_count} new messages |||| 1 new message', {smart_count: 2}, 'en');
+  //     // "2 new messages"
+  //
+  //     transformPhrase('%{smart_count} new messages |||| 1 new message', 5, 'en');
+  //     // "5 new messages"
+  //
+  // You should pass in a third argument, the locale, to specify the correct plural type.
+  // It defaults to `'en'` with 2 plural forms.
+  static transformPhrase(
+    phrase,
+    substitutions,
+    locale = 'en',
+    tokenRegex = defaultTokenRegex,
+    pluralRules = defaultPluralRules,
+  ) {
+    if (typeof phrase !== 'string') {
+      throw new TypeError('Polyglot.transformPhrase expects argument #1 to be string');
+    }
+
+    if (typeof substitutions === 'undefined') return phrase;
+
+    let result = phrase;
+
+    // allow number as a pluralization shortcut
+    const options = (typeof substitutions === 'number') ? {
+      smart_count: substitutions,
+    } : substitutions;
+    const smartCount = options.smart_count;
+
+    // Select plural form: based on a phrase text that contains `n`
+    // plural forms separated by `delimiter`, a `locale`, and a `substitutions.smart_count`,
+    // choose the correct plural form. This is only done if `count` is set.
+    if (typeof smartCount === 'number' && result) {
+      const texts = result.split(delimiter);
+      result = (texts[pluralTypeIndex(pluralRules, locale, smartCount)] || texts[0]).trim();
+    }
+
+    // Interpolate: Creates a `RegExp` object for each interpolation placeholder.
+    const replacer = (expression, argument) => {
+      const replacement = options[argument];
+      return (typeof replacement === 'undefined') ? expression : replacement;
+    };
+
+    return result.replace(tokenRegex, replacer);
+  }
 }
 
-// eslint-disable-next-line
-exports = module.exports = Polyglot;
-
-// export transformPhrase
-exports.transformPhrase = transformPhrase;
+module.exports = Polyglot;
