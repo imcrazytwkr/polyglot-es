@@ -229,7 +229,7 @@ class Polyglot {
     this.pluralRules = options.pluralRules || defaultPluralRules;
   }
 
-  // ### polyglot.locale([locale])
+  // ### Polyglot#locale([locale])
   //
   // Get or set locale. Internally, Polyglot only uses locale for pluralization.
   locale(newLocale) {
@@ -237,7 +237,7 @@ class Polyglot {
     return this.currentLocale;
   }
 
-  // ### polyglot.extend(phrases)
+  // ### Polyglot#extend(phrases)
   //
   // Use `extend` to tell Polyglot how to translate a given key.
   //
@@ -298,7 +298,7 @@ class Polyglot {
     }, this);
   }
 
-  // ### polyglot.unset(phrases)
+  // ### Polyglot#unset(phrases)
   // Use `unset` to selectively remove keys from a polyglot instance.
   //
   //     polyglot.unset("some_key");
@@ -326,7 +326,7 @@ class Polyglot {
     }, this);
   }
 
-  // ### polyglot.clear()
+  // ### Polyglot#clear()
   //
   // Clears all phrases. Useful for special cases, such as freeing
   // up memory if you have lots of phrases but no longer need to
@@ -335,7 +335,7 @@ class Polyglot {
     this.phrases = {};
   }
 
-  // ### polyglot.replace(phrases)
+  // ### Polyglot#replace(phrases)
   //
   // Completely replace the existing phrases with a new set of phrases.
   // Normally, just use `extend` to add more phrases, but under certain
@@ -345,7 +345,7 @@ class Polyglot {
     this.extend(newPhrases);
   }
 
-  // ### polyglot.t(key, options)
+  // ### Polyglot#t(key, options)
   //
   // The most-used method. Provide a key, and `t` will return the
   // phrase.
@@ -404,7 +404,7 @@ class Polyglot {
     return result;
   }
 
-  // ### polyglot.has(key)
+  // ### Polyglot#has(key)
   //
   // Check if polyglot has a translation for given key
   has(key) {
