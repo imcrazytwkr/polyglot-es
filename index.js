@@ -51,22 +51,24 @@ function icelandicPluralGroups(n) {
 }
 
 function lithuanianPluralGroups(n) {
-  if (n % 10 === 1 && n % 100 !== 11) return 0;
-  return (n % 10 >= 2 && n % 10 <= 9 && (n % 100 < 11 || n % 100 > 19)) ? 1 : 2;
+  const lastTwo = n % 100;
+  const lastOne = lastTwo % 10;
+  if (lastOne === 1 && lastTwo !== 11) return 0;
+  return (lastOne >= 2 && lastOne <= 9 && (lastTwo < 11 || lastTwo > 19)) ? 1 : 2;
 }
 
 function polistPluralGroups(n) {
-  if (n === 1) { return 0; }
-  const end = n % 10;
-  return end >= 2 && end <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
+  if (n === 1) return 0;
+  const lastTwo = n % 100;
+  const lastOne = lastTwo % 10;
+  return (lastOne >= 2 && lastOne <= 4 && (lastTwo < 10 || lastTwo >= 20)) ? 1 : 2;
 }
 
 function russianPluralGroups(n) {
   const lastTwo = n % 100;
-  const end = lastTwo % 10;
-
-  if (lastTwo !== 11 && end === 1) return 0;
-  return (end >= 2 && end <= 4 && !(lastTwo >= 12 && lastTwo <= 14)) ? 1 : 2;
+  const lastOne = lastTwo % 10;
+  if (lastTwo !== 11 && lastOne === 1) return 0;
+  return (lastOne >= 2 && lastOne <= 4 && !(lastTwo >= 12 && lastTwo <= 14)) ? 1 : 2;
 }
 
 function slovenianPluralGroups(n) {
