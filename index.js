@@ -145,9 +145,8 @@ function escape(token) {
   return token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function constructTokenRegex(options) {
-  const prefix = (options && options.prefix) || '%{';
-  const suffix = (options && options.suffix) || '}';
+function constructTokenRegex(options = {}) {
+  const { prefix = '%{', suffix = '}' } = options;
 
   if (prefix === delimiter || suffix === delimiter) {
     throw new RangeError(`"${delimiter}" token is reserved for pluralization`);
