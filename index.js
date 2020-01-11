@@ -108,7 +108,25 @@ const defaultPluralRules = Object.freeze({
     bosnian_serbian: ['bs-Latn-BA', 'bs-Cyrl-BA', 'srl-RS', 'sr-RS'],
     chinese: ['id', 'id-ID', 'ja', 'ko', 'ko-KR', 'lo', 'ms', 'th', 'th-TH', 'zh'],
     croatian: ['hr', 'hr-HR'],
-    german: ['fa', 'da', 'de', 'en', 'es', 'fi', 'el', 'he', 'hi-IN', 'hu', 'hu-HU', 'it', 'nl', 'no', 'pt', 'sv', 'tr'],
+    german: [
+      'fa',
+      'da',
+      'de',
+      'en',
+      'es',
+      'fi',
+      'el',
+      'he',
+      'hi-IN',
+      'hu',
+      'hu-HU',
+      'it',
+      'nl',
+      'no',
+      'pt',
+      'sv',
+      'tr',
+    ],
     french: ['fr', 'tl', 'pt-br'],
     russian: ['ru', 'ru-RU'],
     lithuanian: ['lt'],
@@ -120,7 +138,9 @@ const defaultPluralRules = Object.freeze({
 });
 
 function accumulateToTypeMap(accumulator, [type, langs]) {
-  return (langs.length > 0) ? langs.reduce((acc, lang) => {
+  // @NOTE: filter by boolean is added to trim all empty and undefined (from trailing commas
+  // in multi-line arrays, for example) values
+  return (langs.length > 0) ? langs.filter(Boolean).reduce((acc, lang) => {
     acc[lang] = type;
     return acc;
   }, accumulator) : accumulator;
