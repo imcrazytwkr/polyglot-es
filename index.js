@@ -119,16 +119,15 @@ const defaultPluralRules = Object.freeze({
   },
 });
 
+function accumulateToTypeMap(accumulator, [type, langs]) {
+  return (langs.length > 0) ? langs.reduce((acc, lang) => {
+    acc[lang] = type;
+    return acc;
+  }, accumulator) : accumulator;
+}
+
 function langToTypeMap(mapping) {
-  const typeMap = {};
-
-  Object.entries(mapping).forEach(([type, langs]) => {
-    langs.forEach((lang) => {
-      typeMap[lang] = type;
-    });
-  });
-
-  return typeMap;
+  return Object.entries(mapping).reduce(accumulateToTypeMap, {});
 }
 
 function pluralTypeName(pluralRules, locale) {
