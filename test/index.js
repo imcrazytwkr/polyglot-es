@@ -584,9 +584,10 @@ describe('extend', () => {
 
   it('supports optional `prefix` argument', () => {
     polyglot.extend({ click: 'Click', hover: 'Hover' }, 'sidebar');
-    expect(polyglot.phrases['sidebar.click']).to.equal('Click');
-    expect(polyglot.phrases['sidebar.hover']).to.equal('Hover');
-    expect(polyglot.phrases).not.to.have.property('click');
+    expect(polyglot.phrases.get('sidebar.click')).to.equal('Click');
+    expect(polyglot.phrases.get('sidebar.hover')).to.equal('Hover');
+    expect(polyglot.has('click')).to.equal(false);
+    expect(polyglot.has('hover')).to.equal(false);
   });
 
   it('supports nested object', () => {
@@ -601,12 +602,13 @@ describe('extend', () => {
         },
       },
     });
-    expect(polyglot.phrases['sidebar.click']).to.equal('Click');
-    expect(polyglot.phrases['sidebar.hover']).to.equal('Hover');
-    expect(polyglot.phrases['nav.header.log_in']).to.equal('Log In');
-    expect(polyglot.phrases).not.to.have.property('click');
-    expect(polyglot.phrases).not.to.have.property('header.log_in');
-    expect(polyglot.phrases).not.to.have.property('log_in');
+    expect(polyglot.phrases.get('sidebar.click')).to.equal('Click');
+    expect(polyglot.phrases.get('sidebar.hover')).to.equal('Hover');
+    expect(polyglot.phrases.get('nav.header.log_in')).to.equal('Log In');
+    expect(polyglot.has('click')).to.equal(false);
+    expect(polyglot.has('hover')).to.equal(false);
+    expect(polyglot.has('log_in')).to.equal(false);
+    expect(polyglot.has('header.log_in')).to.equal(false);
   });
 });
 
