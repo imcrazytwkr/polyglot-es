@@ -145,9 +145,9 @@ function escape(token) {
   return token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function constructTokenRegex(opts) {
-  const prefix = (opts && opts.prefix) || '%{';
-  const suffix = (opts && opts.suffix) || '}';
+function constructTokenRegex(options) {
+  const prefix = (options && options.prefix) || '%{';
+  const suffix = (options && options.suffix) || '}';
 
   if (prefix === delimiter || suffix === delimiter) {
     throw new RangeError(`"${delimiter}" token is reserved for pluralization`);
@@ -217,16 +217,16 @@ function transformPhrase(phrase, substitutions, locale = 'en', tokenRegex, plura
 
 class Polyglot {
   // ### Polyglot class constructor
-  constructor(options) {
-    const opts = options || {};
+  constructor(options = {}) {
     this.phrases = {};
-    this.extend(opts.phrases || {});
-    this.currentLocale = opts.locale || 'en';
-    const allowMissing = opts.allowMissing ? transformPhrase : null;
-    this.onMissingKey = typeof opts.onMissingKey === 'function' ? opts.onMissingKey : allowMissing;
-    this.warn = opts.warn || noop;
-    this.tokenRegex = constructTokenRegex(opts.interpolation);
-    this.pluralRules = opts.pluralRules || defaultPluralRules;
+    this.extend(options.phrases || {});
+    this.currentLocale = options.locale || 'en';
+    const allowMissing = options.allowMissing ? transformPhrase : null;
+    const { onMissingKey } = options;
+    this.onMissingKey = typeof onMissingKey === 'function' ? onMissingKey : allowMissing;
+    this.warn = options.warn || noop;
+    this.tokenRegex = constructTokenRegex(options.interpolation);
+    this.pluralRules = options.pluralRules || defaultPluralRules;
   }
 
   // ### polyglot.locale([locale])
@@ -370,24 +370,35 @@ class Polyglot {
   //     });
   //     => "I like to write in JavaScript."
   //
-  t(key, options) {
+  t(key, options = {}) {
     let phrase;
     let result;
 
-    const opts = options == null ? {} : options;
-
     if (typeof this.phrases[key] === 'string') {
       phrase = this.phrases[key];
-    } else if (typeof opts._ === 'string') {
-      phrase = opts._;
+    } else if (typeof options._ === 'string') {
+      phrase = options._;
     } else if (this.onMissingKey) {
-      result = this.onMissingKey(key, opts, this.currentLocale, this.tokenRegex, this.pluralRules);
+      result = this.onMissingKey(
+        key,
+        options,
+        this.currentLocale,
+        this.tokenRegex,
+        this.pluralRules,
+      );
     } else {
       this.warn(`Missing translation for key: "${key}"`);
       result = key;
     }
+
     if (typeof phrase === 'string') {
-      result = transformPhrase(phrase, opts, this.currentLocale, this.tokenRegex, this.pluralRules);
+      result = transformPhrase(
+        phrase,
+        options,
+        this.currentLocale,
+        this.tokenRegex,
+        this.pluralRules,
+      );
     }
 
     return result;
